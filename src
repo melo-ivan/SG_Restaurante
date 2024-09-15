@@ -1,0 +1,111 @@
+-- Cria um novo banco de dados chamado RestauranteDB
+CREATE DATABASE RestauranteDB;
+
+-- Seleciona o banco de dados RestauranteDB para que todos os comandos SQL seguintes sejam executados dentro dele
+USE RestauranteDB;
+
+-- Cria a tabela Clientes
+CREATE TABLE Clientes (
+    -- Cria a coluna id_cliente como um número inteiro que incrementa automaticamente e é a chave primária
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    -- Cria a coluna nome para armazenar o nome do cliente, com até 100 caracteres e que não pode ser nula
+    nome VARCHAR(100) NOT NULL,
+    -- Cria a coluna telefone para armazenar o telefone do cliente, com até 15 caracteres
+    telefone VARCHAR(15),
+    -- Cria a coluna email para armazenar o e-mail do cliente, com até 100 caracteres
+    email VARCHAR(100)
+);
+
+-- Cria a tabela Mesas
+CREATE TABLE Mesas (
+    -- Cria a coluna id_mesa como um número inteiro que incrementa automaticamente e é a chave primária
+    id_mesa INT AUTO_INCREMENT PRIMARY KEY,
+    -- Cria a coluna numero_mesa para armazenar o número da mesa, que não pode ser nulo
+    numero_mesa INT NOT NULL,
+    -- Cria a coluna capacidade para armazenar a capacidade da mesa, que não pode ser nula
+    capacidade INT NOT NULL
+);
+
+-- Cria a tabela Pedidos
+CREATE TABLE Pedidos (
+    -- Cria a coluna id_pedido como um número inteiro que incrementa automaticamente e é a chave primária
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    -- Cria a coluna id_cliente para referenciar o cliente que fez o pedido
+    id_cliente INT,
+    -- Cria a coluna id_mesa para referenciar a mesa onde o pedido foi feito
+    id_mesa INT,
+    -- Cria a coluna data_pedido para armazenar a data e hora do pedido, que não pode ser nula
+    data_pedido DATETIME NOT NULL,
+    -- Cria a coluna total para armazenar o valor total do pedido, com até 10 dígitos no total e 2 casas decimais, que não pode ser nula
+    total DECIMAL(10, 2) NOT NULL,
+    -- Define id_cliente como uma chave estrangeira referenciando a coluna id_cliente na tabela Clientes
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+    -- Define id_mesa como uma chave estrangeira referenciando a coluna id_mesa na tabela Mesas
+    FOREIGN KEY (id_mesa) REFERENCES Mesas(id_mesa)
+);
+
+-- Cria a tabela Itens_Pedido
+CREATE TABLE Itens_Pedido (
+    -- Cria a coluna id_item como um número inteiro que incrementa automaticamente e é a chave primária
+    id_item INT AUTO_INCREMENT PRIMARY KEY,
+    -- Cria a coluna id_pedido para referenciar o pedido ao qual o item pertence
+    id_pedido INT,
+    -- Cria a coluna descricao_item para armazenar a descrição do item, com até 255 caracteres e que não pode ser nula
+    descricao_item VARCHAR(255) NOT NULL,
+    -- Cria a coluna quantidade para armazenar a quantidade do item no pedido, que não pode ser nula
+    quantidade INT NOT NULL,
+    -- Cria a coluna preco_unitario para armazenar o preço unitário do item, com até 10 dígitos no total e 2 casas decimais, que não pode ser nula
+    preco_unitario DECIMAL(10, 2) NOT NULL,
+    -- Define id_pedido como uma chave estrangeira referenciando a coluna id_pedido na tabela Pedidos
+    FOREIGN KEY (id_pedido) REFERENCES Pedidos(id_pedido)
+);
+
+-- Insere dados fictícios na tabela Clientes
+INSERT INTO Clientes (nome, telefone, email) VALUES ('João Silva', '123456789', 'joao.silva@example.com');
+INSERT INTO Clientes (nome, telefone, email) VALUES ('Maria Oliveira', '987654321', 'maria.oliveira@example.com');
+
+-- Insere dados fictícios na tabela Mesas
+INSERT INTO Mesas (numero_mesa, capacidade) VALUES (1, 4);
+INSERT INTO Mesas (numero_mesa, capacidade) VALUES (2, 2);
+
+-- Insere dados fictícios na tabela Pedidos
+INSERT INTO Pedidos (id_cliente, id_mesa, data_pedido, total) VALUES (1, 1, '2024-08-14 19:00:00', 50.00);
+INSERT INTO Pedidos (id_cliente, id_mesa, data_pedido, total) VALUES (2, 2, '2024-08-14 20:00:00', 30.00);
+
+-- Insere dados fictícios na tabela Itens_Pedido
+INSERT INTO Itens_Pedido (id_pedido, descricao_item, quantidade, preco_unitario) VALUES (1, 'Pizza Margherita', 1, 25.00);
+INSERT INTO Itens_Pedido (id_pedido, descricao_item, quantidade, preco_unitario) VALUES (1, 'Cerveja', 2, 12.50);
+INSERT INTO Itens_Pedido (id_pedido, descricao_item, quantidade, preco_unitario) VALUES (2, 'Hambúrguer', 1, 30.00);
+
+-- Consulta todos os registros na tabela Clientes
+SELECT * FROM Clientes;
+
+-- Consulta todos os registros na tabela Mesas
+SELECT * FROM Mesas;
+
+-- Consulta todos os registros na tabela Pedidos
+SELECT * FROM Pedidos;
+
+-- Consulta todos os itens de um pedido específico, incluindo o subtotal de cada item
+SELECT i.descricao_item, i.quantidade, i.preco_unitario, (i.quantidade * i.preco_unitario) AS subtotal
+FROM Itens_Pedido i
+JOIN Pedidos p ON i.id_pedido = p.id_pedido
+WHERE p.id_pedido = 1;
+
+-- Atualiza o telefone e o e-mail do cliente com id_cliente igual a 1
+UPDATE Clientes
+SET telefone = '555555555', email = 'joao.silva@novoemail.com'
+WHERE id_cliente = 1;
+
+-- Atualiza a capacidade da mesa com id_mesa igual a 1
+UPDATE Mesas
+SET capacidade = 6
+WHERE id_mesa = 1;
+
+-- Deleta o pedido com id_pedido igual a 1
+DELETE FROM Pedidos WHERE id_pedido = 1;
+
+-- Opcionalmente, para garantir que não há dados órfãos, deleta os itens do pedido com id_pedido igual a 1
+DELETE FROM Itens_Pedido WHERE id_pedido = 1;
+
+
